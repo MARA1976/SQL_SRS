@@ -44,8 +44,7 @@ if query:
     result = duckdb.sql(query).df()
     st.dataframe(result)
 
-    if len(result.columns) != len(solution.columns
-    ):
+    if len(result.columns) != len(solution.columns):
         st.write("some columns are missing")
     try:
         result = result[solution.columns]
