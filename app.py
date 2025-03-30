@@ -1,5 +1,11 @@
 import streamlit as st
 import duckdb as db
+import pandas as pd
+
+
+st.write("""
+#SQL SRS Spaced repetition  System SQL practice
+""")
 
 st.write("Hello world!")
 with st.sidebar:
