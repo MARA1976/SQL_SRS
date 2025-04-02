@@ -1,4 +1,6 @@
-
+init_db.py
+test_db.py
 .idea/
 myvenv/
 .*csv
+data/
