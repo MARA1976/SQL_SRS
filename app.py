@@ -5,6 +5,8 @@ import logging
 import duckdb
 import numpy as np
 import streamlit as st
+import pandas as pd
+from click import clear
 
 if "data" not in os.listdir():
     print("creating folder data")
@@ -14,24 +16,32 @@ if "data" not in os.listdir():
 if "exercises_sql_tables.duckdb" not in os.listdir("data"):
     exec(open("init_db.py").read()) # pylint: disable=missing-module-docstring
 
-
 con = duckdb.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
 
 with st.sidebar:
+    available_themes_df = con.execute(f"SELECT DISTINCT theme FROM memory_state").df()
     theme = st.selectbox(
         "what would you like to review?",
-        ("cross_joins", "GroupBy", "Windows Functions"),
+        available_themes_df ["theme"].unique(),
         index=None,
         placeholder="Select a theme...",
     )
-    st.write("You selected:", theme)
+    if theme:
+        st.write( f"You selected {theme}" )
+        exercise = (
+            con.execute( f"SELECT * FROM memory_state WHERE theme = '{theme}'" )
+            .df()
+            .sort_values( "last_reviewed" )
+            .reset_index( drop=True )
+        )
+    else:
+        exercise = (
+            con.execute( f"SELECT * FROM memory_state" )
+            .df()
+            .sort_values( "last_reviewed" )
+            .reset_index( drop=True )
+        )
 
-    exercise = (
-        con.execute(f"SELECT * FROM memory_state WHERE theme = '{theme}'")
-        .df()
-        .sort_values("last_reviewed")
-        .reset_index(drop = True)
-    )
     st.write(exercise)
 
     exercise_name = exercise.loc[0, "exercise_name"]
@@ -39,6 +49,7 @@ with st.sidebar:
         answer = f.read()
 
     solution_df = con.execute(answer).df()
+
 
 st.header("enter your code:")
 query = st.text_area(label="votre code sql ici", key="user_input")

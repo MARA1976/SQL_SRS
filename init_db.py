@@ -2,14 +2,15 @@ import io
 import duckdb
 import pandas as pd
 
-# Connexion à la base de données
+
 con = duckdb.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
+
 
 # --------------------------------------------------------------------------
 # EXERCISE LIST
 # --------------------------------------------------------------------------
 
-# Données des exercices
+
 data = {
     "theme": ["cross_joins", "cross_joins"],
     "exercise_name": ["beverages_and_food", "sizes_and_trademarks"],
@@ -20,7 +21,7 @@ data = {
 
 memory_state_df = pd.DataFrame(data)
 memory_state_df["tables"] = memory_state_df["tables"].apply(lambda x: list(x))
-con.execute("CREATE TABLE IF NOT EXISTS memory_state AS SELECT * FROM memory_state_df")
+con.execute('CREATE TABLE IF NOT EXISTS memory_state AS SELECT * FROM memory_state_df')
 
 # ------------------------------------------------------------------------
 # CROSS JOINS EXERCISES
