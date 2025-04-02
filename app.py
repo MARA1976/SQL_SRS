@@ -6,7 +6,7 @@ import duckdb
 import numpy as np
 import streamlit as st
 import pandas as pd
-from click import clear
+
 
 if "data" not in os.listdir():
     print("creating folder data")
@@ -17,6 +17,20 @@ if "exercises_sql_tables.duckdb" not in os.listdir("data"):
     exec(open("init_db.py").read()) # pylint: disable=missing-module-docstring
 
 con = duckdb.connect(database="data/exercises_sql_tables.duckdb", read_only=False)
+
+def check_user_solution(user_query: str) -> None:
+    result = con.execute(user_query).df()
+    st.dataframe(result)
+    try:
+        result = result[solution_df.columns]
+        st.dataframe( result.compare( solution_df ) )
+    except KeyError as a:
+        st.write( "Some columns are missing" )
+    n_lines_difference = result.shape[0] - solution_df.shape[0]
+    if n_lines_difference != 0:
+        st.write(
+            f"result has a {n_lines_difference} lines difference with the solution"
+        )
 
 with st.sidebar:
     available_themes_df = con.execute(f"SELECT DISTINCT theme FROM memory_state").df()
@@ -54,21 +68,10 @@ with st.sidebar:
 st.header("enter your code:")
 query = st.text_area(label="votre code sql ici", key="user_input")
 
+
 if query:
-    result = con.execute(query).df()
-    st.dataframe(result)
+    check_user_solution(query)
 
-    try:
-        result = result[solution_df.columns]
-        st.dataframe(result.compare(solution_df))
-    except KeyError as a:
-        st.write("Some columns are missing")
-
-    n_lines_difference = result.shape[0] - solution_df.shape[0]
-    if n_lines_difference != 0:
-        st.write(
-         f"result has a {n_lines_difference} lines difference with the solution"
-      )
 tab2, tab3 = st.tabs(["tables", "solution"])
 
 with tab2:
