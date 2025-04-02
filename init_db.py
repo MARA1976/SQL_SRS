@@ -17,24 +17,15 @@ data = {
     "last_reviewed": ["1980-01-01", "1970-01-01"],
 }
 
-# Création de la DataFrame
+
 memory_state_df = pd.DataFrame(data)
-
-# S'assurer que les éléments de la colonne "tables" sont des listes Python
 memory_state_df["tables"] = memory_state_df["tables"].apply(lambda x: list(x))
-
-# Vérification (peut être désactivée dans une version finale)
-print(type(memory_state_df["tables"][0]))  # Résultat attendu : <class 'list'>
-print(memory_state_df["tables"])  # Résultat attendu : [['beverages', 'food_items'], ['sizes', 'trademarks']]
-
-# Créer une table dans DuckDB
 con.execute("CREATE TABLE IF NOT EXISTS memory_state AS SELECT * FROM memory_state_df")
 
 # ------------------------------------------------------------------------
 # CROSS JOINS EXERCISES
 # ------------------------------------------------------------------------
 
-# Création des données pour la table "beverages"
 CSV = """
 beverages,price
 orange juice,2.5
@@ -44,7 +35,7 @@ Tea,3
 beverages = pd.read_csv(io.StringIO(CSV))
 con.execute("CREATE TABLE IF NOT EXISTS beverages AS SELECT * FROM beverages")
 
-# Création des données pour la table "food_items"
+
 CSV2 = """
 food_item,food_price
 cookie juice,2.5
@@ -54,7 +45,6 @@ muffin,3
 food_items = pd.read_csv(io.StringIO(CSV2))
 con.execute("CREATE TABLE IF NOT EXISTS food_items AS SELECT * FROM food_items")
 
-# Création des données pour la table "sizes"
 sizes = """
 size
 XS
@@ -65,7 +55,6 @@ XL
 sizes = pd.read_csv(io.StringIO(sizes))
 con.execute("CREATE TABLE IF NOT EXISTS sizes AS SELECT * FROM sizes")
 
-# Création des données pour la table "trademarks"
 trademarks = """
 trademark
 Nike
