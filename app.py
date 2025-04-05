@@ -6,7 +6,7 @@ import duckdb
 import numpy as np
 import streamlit as st
 import pandas as pd
-
+from datetime import date, timedelta
 
 if "data" not in os.listdir():
     print("creating folder data")
@@ -24,6 +24,10 @@ def check_user_solution(user_query: str) -> None:
     try:
         result = result[solution_df.columns]
         st.dataframe( result.compare( solution_df ) )
+        if result.compare(solution_df).shape == (0, 0):
+            st.write("correct!")
+            st.balloons()
+
     except KeyError as a:
         st.write( "Some columns are missing" )
     n_lines_difference = result.shape[0] - solution_df.shape[0]
@@ -71,6 +75,16 @@ query = st.text_area(label="votre code sql ici", key="user_input")
 
 if query:
     check_user_solution(query)
+
+for n_days in [2, 7, 21]:
+    if st.button(f'revoir dans {n_days} jours'):
+        next_review = date.today() + timedelta(days=n_days)
+        con.execute(f"UPDATE memory_state SET last_reviewed = '{next_review}' WHERE exercise_name '{exercise_name}'")
+        st.rerurn()
+
+if st.button('Reset'):
+    con.execute(f"UPDATE memory_state SET last_reviewed = '1970-01-01'")
+
 
 tab2, tab3 = st.tabs(["tables", "solution"])
 
